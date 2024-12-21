@@ -1,0 +1,31 @@
+{
+	"Larry":
+	{
+        "image": "images\\Larry.png",
+        "health": 30,
+        "attack": [4, 6, 4, 6, 4, 6, 9],
+        "block": [5, 7],
+        "buffs": [["strength", 2]],
+        "possibleActions": ["attack", "block", "buff"]
+	},
+    
+    "Curly":
+	{
+        "image": "images\\Curly.png",
+        "health": 40,
+        "attack": [5],
+        "block": [8, 11],
+        "debuffs": [["frail", 1]],
+        "possibleActions": ["attack", "block", "debuff"]
+	},
+    
+    "Moe":
+	{
+        "image": "images\\Moe.png",
+        "health": 20,
+        "attack": [7, 7, 11],
+        "buffs": [["strength", 3]],
+        "debuffs": [["vulnerable", 1]],
+        "possibleActions": ["attack", "buff", "debuff"]
+	}
+}

@@ -1,0 +1,13 @@
+{
+    "Strike":
+    {
+        "mana": 1,
+        "damage": 5
+    },
+    
+    "Block":
+    {
+        "mana": 1,
+        "armor": 5
+    }
+}
