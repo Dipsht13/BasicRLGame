@@ -16,7 +16,7 @@ class Player:
         self.name = 'Player'
         self.image  = 'images\\player.jpg'
         
-        self.deck = Deck(['Strike']*5 + ['Block']*5) #always default to 5 strikes & 5 blocks
+        self.deck = Deck(['Strike']*3 + ['Block']*5 + ['Heal']*2 + ['Bite']*2) #always default to 5 strikes & 5 blocks
         self.deck.Shuffle()
         self.hand = []
         self.drawCount = 5

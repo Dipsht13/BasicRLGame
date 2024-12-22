@@ -19,6 +19,7 @@ class Card:
         self.damage = 0
         self.armor = 0
         
+        self.health = 0 # heals the player for n if this attribute exists
         self.strength = 0
         self.steel = 0
         
@@ -28,6 +29,11 @@ class Card:
         
         self.poison = 0
         self.burn = 0
+        
+        self.attrList = ['damage', 'armor', 'health',
+                         'strength', 'steel',
+                         'weak', 'frail', 'vulnerable',
+                         'poison', 'burn']
                 
         
         with open('cards.json', 'r') as f:
@@ -35,39 +41,16 @@ class Card:
             
         self.mana = db_entry['mana']
             
-        if 'damage' in db_entry:
-            self.damage = db_entry['damage']
-        
-        if 'armor' in db_entry:
-            self.armor = db_entry['armor']
-            
-        if 'strength' in db_entry:
-            self.strength = db_entry['strength']
-            
-        if 'steel' in db_entry:
-            self.steel = db_entry['steel']
-            
-        if 'weak' in db_entry:
-            self.weak = db_entry['weak']
-            
-        if 'frail' in db_entry:
-            self.frail = db_entry['frail']
-            
-        if 'vulnerable' in db_entry:
-            self.vulnerable = db_entry['vulnerable']
-            
-        if 'poison' in db_entry:
-            self.poison = db_entry['poison']
-                        
-        if 'burn' in db_entry:
-            self.burn = db_entry['burn']
+        for attr in self.attrList:
+            if attr in db_entry:
+                setattr(self, attr, db_entry[attr])
             
         self.UpdateText()
         
             
     def PlayState(self):
         #return [dmg, block, buffs, debuffs]
-        all_buffs = [['strength', self.strength], ['steel', self.steel]]
+        all_buffs = [['strength', self.strength], ['steel', self.steel], ['health', self.health]]
         all_debuffs = [['weak', self.weak], ['frail', self.frail], ['vulnerable', self.vulnerable],
                        ['poison', self.poison], ['burn', self.burn]]
         
@@ -94,12 +77,15 @@ class Card:
                 armMultiplier = armMultiplier * .75
             self.displayStr += ' Gain ' + str(round(armApplied*armMultiplier)) + ' armor.'
             
+        if self.health > 0:
+            self.displayStr += ' Heal for ' + str(self.health) + '.'
+            
         if self.strength > 0:
             self.displayStr += ' Gain ' + str(self.strength) + ' str.'
             
         if self.steel > 0:
             self.displayStr += ' Gain ' + str(self.steel) + ' stl.'
-            
+        
         if self.weak > 0:
             self.displayStr += ' Apply ' + str(self.weak) + ' weak.'
             

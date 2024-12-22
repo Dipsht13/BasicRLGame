@@ -56,7 +56,7 @@ class App(ctk.CTk):
 
         # configure window
         self.title("Trash the Tower v0.1")
-        self.geometry("900x630")
+        self.geometry("900x730")
         self.resizable(False, False)
 
         # create frame

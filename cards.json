@@ -9,5 +9,18 @@
     {
         "mana": 1,
         "armor": 5
-    }
+    },
+	
+	"Heal":
+	{
+		"mana": 1,
+		"health": 2
+	},
+	
+	"Bite":
+	{
+		"mana": 1,
+		"health": 2,
+		"damage": 7
+	}
 }
