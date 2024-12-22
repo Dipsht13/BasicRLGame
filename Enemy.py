@@ -29,6 +29,7 @@ class Enemy:
         else:
             self.name = name
         
+        self.savingRoll = 6 #25% chance for poison & burn to apply additional effects
         self.image = ''
         self.currentTurn = [0, 0, [], []]
         
@@ -39,6 +40,7 @@ class Enemy:
         
         self.strength = 0
         self.steel = 0
+        self.anointed = 0
                 
         self.weak = 0
         self.frail = 0
@@ -46,8 +48,8 @@ class Enemy:
         self.poison = 0
         self.burn = 0
         
-        self.attrList = ['strength', 'steel', 'weak', 'frail', 'vulnerable',
-                         'poison', 'burn']
+        self.attrList = ['strength', 'steel', 'anointed', 'weak', 'frail', 
+                         'vulnerable', 'poison', 'burn']
         
         self.attack = []
         self.block = []
@@ -79,6 +81,13 @@ class Enemy:
             self.debuffs = db_entry['debuffs']
             
             
+    def D20(self):
+        
+        roll = rng(1, 20)
+        
+        return roll >= self.savingRoll
+            
+            
     def UpdateCurrentTurn(self, action):
         # returns [int attack, int block, list buff, list debuff
         
@@ -97,6 +106,7 @@ class Enemy:
                 block = round(block * .75)
             
             self.currentTurn[1] += block
+            self.Block(block) #block is applied immediately, before the player starts attacking
         
         elif action == "buff":
             newBuff = RNGesus(self.buffs)
@@ -115,11 +125,12 @@ class Enemy:
         
         setattr(self, attr, getattr(self, attr) + val)
         
+        #need to worry about over-healing
+        self.health = min(self.health, self.fullHealth)
+        
             
     def Block(self, block):
-        if self.frail:
-            block = round(0.75*block)
-        
+                
         self.armor += block
         
         
@@ -137,13 +148,58 @@ class Enemy:
             self.health = max(self.health - dmg, 0)  
             
             
-    def TurnEnd(self):
+    def EndTurn(self):
         
-        self.armor = 0
-        
+        self.health += self.anointed
+        self.health = min(self.health, self.fullHealth)
         self.health -= self.poison
-        self.poison -= 1
-        
         self.health -= self.burn
-        self.burn -= 1
+        self.health = max(self.health, 0)
+        
+        if self.anointed:
+            self.anointed -= 1
+        
+        if self.weak > 0:
+            self.weak -= 1
+            
+        if self.frail > 0:
+            self.frail -= 1
+            
+        if self.vulnerable:
+            self.vulnerable -= 1
+        
+        if self.poison > 0:
+            self.poison -= 1
+        
+        if self.burn > 0:
+            self.burn -= 1
+            
+        if self.poison > 0:
+            if not self.D20():
+                self.weak += 1
+        
+        if self.burn > 0:
+            if not self.D20():
+                self.frail += 1
+            
+            
+    def NewTurn(self):
+        
+        #make sure everything's reset
+        self.armor = 0
+        self.currentTurn = [0, 0, [], []]
+        
+        #now decide what the we're doing this turn
+        action = RNGesus(self.possibleActions)
+        self.UpdateCurrentTurn(action)
+        
+        action = RNGesus(self.possibleActions)
+        self.UpdateCurrentTurn(action)
+        
+    
+    def CheckPulse(self):
+        if self.health <= 0:
+            self.dead = True
+            
+        
         

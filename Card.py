@@ -22,6 +22,7 @@ class Card:
         self.health = 0 # heals the player for n if this attribute exists
         self.strength = 0
         self.steel = 0
+        self.anointed = 0
         
         self.weak = 0
         self.frail = 0
@@ -31,7 +32,7 @@ class Card:
         self.burn = 0
         
         self.attrList = ['damage', 'armor', 'health',
-                         'strength', 'steel',
+                         'strength', 'steel', 'anointed',
                          'weak', 'frail', 'vulnerable',
                          'poison', 'burn']
                 
@@ -50,7 +51,7 @@ class Card:
             
     def PlayState(self):
         #return [dmg, block, buffs, debuffs]
-        all_buffs = [['strength', self.strength], ['steel', self.steel], ['health', self.health]]
+        all_buffs = [['strength', self.strength], ['steel', self.steel], ['health', self.health], ['anointed', self.anointed]]
         all_debuffs = [['weak', self.weak], ['frail', self.frail], ['vulnerable', self.vulnerable],
                        ['poison', self.poison], ['burn', self.burn]]
         
@@ -85,6 +86,9 @@ class Card:
             
         if self.steel > 0:
             self.displayStr += ' Gain ' + str(self.steel) + ' stl.'
+        
+        if self.anointed > 0:
+            self.displayStr += ' Gain ' + str(self.anointed) + ' anoint.'
         
         if self.weak > 0:
             self.displayStr += ' Apply ' + str(self.weak) + ' weak.'

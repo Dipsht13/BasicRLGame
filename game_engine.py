@@ -128,57 +128,17 @@ def UpdateGameState(player, enemy):
     return game_str
 
 
-def EndTurnDecrements(person):
-    
-    if person.weak > 0:
-        person.weak -= 1
-        
-    if person.frail > 0:
-        person.frail -= 1
-        
-    if person.vulnerable:
-        person.vulnerable -= 1
-    
-    if person.poison > 0:
-        person.poison -= 1
-    
-    if person.burn > 0:
-        person.burn -= 1
-            
-    if person.poison > 0:
-        if not D20(mustRoll=6):
-            person.weak += 1
-    
-    if person.burn > 0:
-        if not D20(mustRoll=6):
-            person.frail += 1
-
-
 def NewTurn(player, enemy):
-        
-    #first reset mana
-    player.mana = 3
     
-    #now decide what the enemy is doing
-    action1 = RNGesus(enemy.possibleActions)
-    action2 = RNGesus(enemy.possibleActions)
-    enemy.UpdateCurrentTurn(action1)
-    enemy.UpdateCurrentTurn(action2)
-    
-    #most of what the enemy is doing is applied after the player's turn but
-    # if the enemy is blocking that applies prior to the player's attacks
-    if enemy.currentTurn[1] > 0:
-        enemy.Block(enemy.currentTurn[1])
-        
-    #now draw our hand
-    for ix in range(player.drawCount):
-        drawnCard = player.deck.TopDeck()
-        player.hand.append(drawnCard)
+    #this logic is handled by the character classes    
+    enemy.NewTurn()
+    player.NewTurn()   
         
         
 def EndTurn(player, enemy):
     
-    #finish the enemy's turn
+    #a lot more happens in this script for ending turns
+    #now that the player's turn has finished, resolve the enemy's turn
     dmg, block, buffs, debuffs = enemy.currentTurn
     
     if dmg > 0:
@@ -194,45 +154,19 @@ def EndTurn(player, enemy):
         for debuff in debuffs:
             player.ProcessBuffDebuff(debuff)
             
-    #now take damage from poison & burn if appropriate
-    if player.poison:
-        player.health = max(player.health - player.poison, 0)
-        
-    if player.burn:
-        player.health = max(player.health - player.burn, 0)
-        
-    if enemy.poison:
-        enemy.health = max(enemy.health - enemy.poison, 0)
-        
-    if enemy.burn:
-        enemy.health = max(enemy.health - enemy.burn, 0)
-        
-    #and decrement all the status effects that need it
-    EndTurnDecrements(player)
-    EndTurnDecrements(enemy)
+    #the character classes take it from here
+    enemy.EndTurn()
+    player.EndTurn()
     
-    #armor needs to be reset
-    player.armor = 0
-    enemy.armor = 0
-    
-    #enemy currentTurn needs to be reset
-    enemy.currentTurn = [0, 0, [], []]
-    
-    #and any cards remaining in your hand must be discarded
-    for ix in range(len(player.hand)-1, -1, -1):
-        card = player.hand.pop(ix)
-        player.deck.Discard(card)
-        
+    #now just make sure the game isn't over before we move on
     gameOver = CheckGameOver(player, enemy)
     return gameOver
     
     
 def CheckGameOver(player, enemy):
     
-    if player.health <= 0:
-        player.dead = True
-        
-    if enemy.health <= 0:
-        enemy.dead = True
+    player.CheckPulse()
+    enemy.CheckPulse()
         
     return (player.dead or enemy.dead)
+

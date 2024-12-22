@@ -6,6 +6,7 @@ Created on Sun Dec 15 13:59:50 2024
 """
 
 from Deck import Deck
+from random import randint as rng
 
 
 class Player:
@@ -20,6 +21,7 @@ class Player:
         self.deck.Shuffle()
         self.hand = []
         self.drawCount = 5
+        self.savingRoll = 6 #25% chance for burn or poison to apply additional effects
         
         self.path = None
         self.subpath = None
@@ -35,6 +37,7 @@ class Player:
         
         self.strength = 0
         self.steel = 0
+        self.anointed = 0
         
         self.weak = 0
         self.frail = 0
@@ -42,9 +45,15 @@ class Player:
         self.poison = 0
         self.burn = 0
         
-        self.attrList = ['strength', 'steel', 'weak', 'frail', 'vulnerable',
-                         'poison', 'burn']
+        self.attrList = ['strength', 'steel', 'anointed', 'weak', 'frail', 
+                         'vulnerable', 'poison', 'burn']
                 
+    def D20(self):
+        
+        roll = rng(1, 20)
+        
+        return roll >= self.savingRoll
+    
     
     def Block(self, block):
         if self.frail:
@@ -72,16 +81,10 @@ class Player:
         attr = listTuple[0].lower(); val = listTuple[1]
         
         setattr(self, attr, getattr(self, attr) + val)
+        
+        #need to worry about over-healing
+        self.health = min(self.health, self.fullHealth)
             
-        
-    def CanPlay(self, hand_ix):
-        
-        if hand_ix == -1:
-            return True
-        
-        else:
-            return self.hand[hand_ix].mana <= self.mana
-        
             
     def PlayCard(self, hand_ix):
         
@@ -89,16 +92,64 @@ class Player:
         self.mana -= card.mana
         
         return card
+    
+    
+    def EndTurn(self):
+        
+        #first apply anointed, poison, & burn effects
+        self.health += self.anointed
+        self.health = min(self.health, self.fullHealth)
+        self.health -= self.poison
+        self.health -= self.burn
+        self.health = max(self.health, 0)
+        
+        #then decrement all the necessary attributes
+        if self.anointed:
+            self.anointed -= 1
+        
+        if self.weak > 0:
+            self.weak -= 1
             
+        if self.frail > 0:
+            self.frail -= 1
             
-    def TurnEnd(self):
+        if self.vulnerable:
+            self.vulnerable -= 1
+        
+        if self.poison > 0:
+            self.poison -= 1
+        
+        if self.burn > 0:
+            self.burn -= 1
+            
+        if self.poison > 0:
+            if not self.D20():
+                self.weak += 1
+        
+        if self.burn > 0:
+            if not self.D20():
+                self.frail += 1
+                
+        #lastly, need to discard anything remaining in your hand
+        for ix in range(len(self.hand)-1, -1, -1):
+            card = self.hand.pop(ix)
+            self.deck.Discard(card)
+    
+            
+    def NewTurn(self):
         
         self.mana = 3
         
         self.armor = 0
+                
+        #now draw our hand
+        for ix in range(self.drawCount):
+            drawnCard = self.deck.TopDeck()
+            self.hand.append(drawnCard)
         
-        self.health -= self.poison
-        self.poison -= 1
         
-        self.health -= self.burn
-        self.burn -= 1
+    def CheckPulse(self):
+        if self.health <= 0:
+            self.dead = True
+            
+        
