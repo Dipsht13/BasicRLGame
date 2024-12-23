@@ -42,11 +42,10 @@ class Player:
         self.weak = 0
         self.frail = 0
         self.vulnerable = 0
-        self.poison = 0
-        self.burn = 0
+        self.bleed = 0
         
         self.attrList = ['strength', 'steel', 'anointed', 'weak', 'frail', 
-                         'vulnerable', 'poison', 'burn']
+                         'vulnerable', 'bleed']
                 
     def D20(self):
         
@@ -84,7 +83,8 @@ class Player:
         
         #need to worry about over-healing
         self.health = min(self.health, self.fullHealth)
-            
+        #might as well do this too
+        self.health = max(self.health, 0)
             
     def PlayCard(self, hand_ix):
         
@@ -99,8 +99,7 @@ class Player:
         #first apply anointed, poison, & burn effects
         self.health += self.anointed
         self.health = min(self.health, self.fullHealth)
-        self.health -= self.poison
-        self.health -= self.burn
+        self.health -= self.bleed
         self.health = max(self.health, 0)
         
         #then decrement all the necessary attributes
@@ -116,20 +115,9 @@ class Player:
         if self.vulnerable:
             self.vulnerable -= 1
         
-        if self.poison > 0:
-            self.poison -= 1
+        if self.bleed > 0:
+            self.bleed -= 1
         
-        if self.burn > 0:
-            self.burn -= 1
-            
-        if self.poison > 0:
-            if not self.D20():
-                self.weak += 1
-        
-        if self.burn > 0:
-            if not self.D20():
-                self.frail += 1
-                
         #lastly, need to discard anything remaining in your hand
         for ix in range(len(self.hand)-1, -1, -1):
             card = self.hand.pop(ix)

@@ -28,13 +28,12 @@ class Card:
         self.frail = 0
         self.vulnerable = 0
         
-        self.poison = 0
-        self.burn = 0
+        self.bleed = 0
         
         self.attrList = ['damage', 'armor', 'health',
                          'strength', 'steel', 'anointed',
                          'weak', 'frail', 'vulnerable',
-                         'poison', 'burn']
+                         'bleed']
                 
         
         with open('cards.json', 'r') as f:
@@ -53,7 +52,7 @@ class Card:
         #return [dmg, block, buffs, debuffs]
         all_buffs = [['strength', self.strength], ['steel', self.steel], ['health', self.health], ['anointed', self.anointed]]
         all_debuffs = [['weak', self.weak], ['frail', self.frail], ['vulnerable', self.vulnerable],
-                       ['poison', self.poison], ['burn', self.burn]]
+                       ['bleed', self.bleed]]
         
         return [self.damage, self.armor, all_buffs, all_debuffs]
     
@@ -99,9 +98,7 @@ class Card:
         if self.vulnerable > 0:
             self.displayStr += ' Apply ' + str(self.vulnerable) + ' vuln.'
             
-        if self.poison > 0:
-            self.displayStr += ' Apply ' + str(self.poison) + ' psn.'
+        if self.bleed > 0:
+            self.displayStr += ' Apply ' + str(self.bleed) + ' bld.'
             
-        if self.burn > 0:
-            self.displayStr += ' Apply ' + str(self.burn) + ' brn.'
         

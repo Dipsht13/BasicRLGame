@@ -29,7 +29,7 @@ class Enemy:
         else:
             self.name = name
         
-        self.savingRoll = 6 #25% chance for poison & burn to apply additional effects
+        self.savingRoll = 6 #25% chance 
         self.image = ''
         self.currentTurn = [0, 0, [], []]
         
@@ -45,11 +45,10 @@ class Enemy:
         self.weak = 0
         self.frail = 0
         self.vulnerable = 0
-        self.poison = 0
-        self.burn = 0
+        self.bleed = 0
         
         self.attrList = ['strength', 'steel', 'anointed', 'weak', 'frail', 
-                         'vulnerable', 'poison', 'burn']
+                         'vulnerable', 'bleed']
         
         self.attack = []
         self.block = []
@@ -127,6 +126,8 @@ class Enemy:
         
         #need to worry about over-healing
         self.health = min(self.health, self.fullHealth)
+        #might as well check this too
+        self.health = max(self.health, 0)
         
             
     def Block(self, block):
@@ -152,8 +153,7 @@ class Enemy:
         
         self.health += self.anointed
         self.health = min(self.health, self.fullHealth)
-        self.health -= self.poison
-        self.health -= self.burn
+        self.health -= self.bleed
         self.health = max(self.health, 0)
         
         if self.anointed:
@@ -168,19 +168,8 @@ class Enemy:
         if self.vulnerable:
             self.vulnerable -= 1
         
-        if self.poison > 0:
-            self.poison -= 1
-        
-        if self.burn > 0:
-            self.burn -= 1
-            
-        if self.poison > 0:
-            if not self.D20():
-                self.weak += 1
-        
-        if self.burn > 0:
-            if not self.D20():
-                self.frail += 1
+        if self.bleed > 0:
+            self.bleed -= 1
             
             
     def NewTurn(self):
